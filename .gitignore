@@ -27,3 +27,7 @@ coverage/
 
 # Misc
 *.local
+
+# Skills (not part of this project)
+.agents/
+.skills/
