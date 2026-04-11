@@ -26,10 +26,10 @@ export function PagosPendientesAlert({ pagos }: PagosPendientesAlertProps) {
           {pagos.map((pago) => (
             <div
               key={pago.id}
-              className="flex items-center gap-3 text-sm bg-crema px-3 py-2 rounded-lg"
+              className="flex items-center gap-3 text-sm bg-crema dark:bg-gray-800 px-3 py-2 rounded-lg"
             >
-              <span className="text-gray-600">{pago.numero}</span>
-              <span className="text-gray-500">
+              <span className="text-gray-600 dark:text-gray-300">{pago.numero}</span>
+              <span className="text-gray-500 dark:text-gray-400">
                 S/ {pago.monto_pagado.toFixed(2)} pagados / S/ {pago.saldo_pendiente.toFixed(2)}{' '}
                 pendiente
               </span>

@@ -60,7 +60,7 @@ export function UltimasAsistenciasCard({ assistencias, isLoading }: UltimasAsist
           <CardTitle>Últimas Asistencias</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-gray-500 text-sm text-center py-8">
+          <p className="text-gray-500 dark:text-gray-400 text-sm text-center py-8">
             No hay registro de assistencias recientes.
           </p>
         </CardContent>
@@ -80,19 +80,19 @@ export function UltimasAsistenciasCard({ assistencias, isLoading }: UltimasAsist
               key={asistencia.id}
               className={cn(
                 'flex items-center gap-4 p-3 rounded-lg',
-                index % 2 === 0 ? 'bg-crema/50' : 'bg-white'
+                index % 2 === 0 ? 'bg-crema/50 dark:bg-gray-800/50' : 'bg-white dark:bg-gray-800'
               )}
             >
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="font-medium text-gray-900 truncate">
+                  <span className="font-medium text-gray-900 dark:text-gray-100 truncate">
                     {asistencia.taller_nombre}
                   </span>
                   <Badge variant={getEstadoBadgeVariant(asistencia.estado)}>
                     {getEstadoLabel(asistencia.estado)}
                   </Badge>
                 </div>
-                <div className="text-xs text-gray-500">
+                <div className="text-xs text-gray-500 dark:text-gray-400">
                   {formatShortDate(asistencia.fecha)} • {asistencia.hora}
                 </div>
               </div>

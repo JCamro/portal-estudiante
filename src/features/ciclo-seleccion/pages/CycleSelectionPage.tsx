@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Calendar } from 'lucide-react';
 import { useAuthStore } from '@/features/auth/store/authStore';
@@ -85,8 +85,8 @@ const CicloCard = memo(function CicloCard({
       {/* Status */}
       {activo && (
         <div className="mb-4">
-          <span className="inline-flex items-center text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
-            <span className="w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5"></span>
+          <span className="inline-flex items-center text-xs bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300 px-2 py-1 rounded-full">
+            <span className="w-1.5 h-1.5 bg-green-500 dark:bg-green-400 rounded-full mr-1.5"></span>
             Ciclo activo
           </span>
         </div>
@@ -114,15 +114,15 @@ export function CycleSelectionPage() {
   const selectedCicloId = useAuthStore((state) => state.selectedCicloId);
   const setSelectedCicloId = useAuthStore((state) => state.setSelectedCicloId);
 
-  // Auto-skip if only 1 ciclo
-  if (ciclos && ciclos.length === 1) {
-    const singleCiclo = ciclos[0];
-    if (!selectedCicloId || selectedCicloId !== singleCiclo.id) {
-      setSelectedCicloId(singleCiclo.id);
+  // Auto-select if only 1 ciclo (but show page, don't auto-skip)
+  useEffect(() => {
+    if (ciclos && ciclos.length === 1) {
+      const singleCiclo = ciclos[0];
+      if (!selectedCicloId || selectedCicloId !== singleCiclo.id) {
+        setSelectedCicloId(singleCiclo.id);
+      }
     }
-    navigate('/dashboard', { replace: true });
-    return null;
-  }
+  }, [ciclos, selectedCicloId, setSelectedCicloId]);
 
   const handleSelectCiclo = (cicloId: number) => {
     setSelectedCicloId(cicloId);
@@ -201,7 +201,7 @@ export function CycleSelectionPage() {
         </div>
 
         {/* Confirm button */}
-        {ciclos.length > 1 && (
+        {ciclos.length >= 1 && (
           <div className="mt-8 flex justify-center">
             <Button
               variant="gold"

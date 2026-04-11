@@ -32,7 +32,7 @@ export function HorariosProximosCard({ horarios, isLoading }: HorariosProximosCa
           <CardTitle>Horarios de la Semana</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-gray-500 text-sm text-center py-8">No tenés horarios programados.</p>
+          <p className="text-gray-500 dark:text-gray-400 text-sm text-center py-8">No tenés horarios programados.</p>
         </CardContent>
       </Card>
     );
@@ -57,13 +57,13 @@ export function HorariosProximosCard({ horarios, isLoading }: HorariosProximosCa
                 className={cn(
                   'flex items-center gap-3 p-3 rounded-lg border transition-all',
                   esHoy
-                    ? 'bg-crema border-l-4 border-l-gold border-gold/20'
-                    : 'border-gray-100 hover:border-gold/30'
+                    ? 'bg-crema dark:bg-gray-800 border-l-4 border-l-gold border-gold/20'
+                    : 'border-gray-100 dark:border-gray-700 hover:border-gold/30'
                 )}
               >
                 <div className="text-center min-w-[60px]">
                   <div
-                    className={cn('text-sm font-medium', esHoy ? 'text-gold' : 'text-gray-900')}
+                    className={cn('text-sm font-medium', esHoy ? 'text-gold' : 'text-gray-900 dark:text-gray-100')}
                   >
                     {getDiaSemana(horario.dia_semana)}
                   </div>
@@ -74,14 +74,14 @@ export function HorariosProximosCard({ horarios, isLoading }: HorariosProximosCa
                   )}
                 </div>
 
-                <div className="flex-1 border-l border-gray-200 pl-3">
+                <div className="flex-1 border-l border-gray-200 dark:border-gray-700 pl-3">
                   <div className="flex items-center gap-2">
-                    <span className="font-medium text-gray-900">{horario.taller_nombre}</span>
+                    <span className="font-medium text-gray-900 dark:text-gray-100">{horario.taller_nombre}</span>
                   </div>
-                  <div className="text-sm text-gray-500">
+                  <div className="text-sm text-gray-500 dark:text-gray-400">
                     {horario.hora_inicio} - {horario.hora_fin}
                   </div>
-                  <div className="text-xs text-gray-400">{horario.profesor_nombre}</div>
+                  <div className="text-xs text-gray-400 dark:text-gray-500">{horario.profesor_nombre}</div>
                 </div>
               </div>
             );

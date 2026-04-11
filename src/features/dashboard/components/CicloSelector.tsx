@@ -18,7 +18,7 @@ export function CicloSelector() {
       <span className="text-sm bg-gold/10 text-gold px-3 py-1 rounded-full font-medium">
         {ciclo.nombre}
         {ciclo.has_matricula_activa && (
-          <span className="ml-1.5 inline-flex items-center text-xs bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full">
+          <span className="ml-1.5 inline-flex items-center text-xs bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300 px-1.5 py-0.5 rounded-full">
             ● Activo
           </span>
         )}

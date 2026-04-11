@@ -28,7 +28,7 @@ export function DashboardPage() {
       <div className="min-h-screen bg-crema">
         <header className="bg-white shadow-sm">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-            <h1 className="text-xl font-bold text-gray-900 font-righteous">Portal del Estudiante</h1>
+            <h1 className="text-xl font-bold text-gray-900 dark:text-white font-righteous">Portal del Estudiante</h1>
             <Button variant="gold" size="sm" onClick={handleLogout}>
               Cerrar sesión
             </Button>
@@ -37,15 +37,15 @@ export function DashboardPage() {
 
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
           {/* Greeting skeleton */}
-          <Skeleton className="h-24 rounded-xl" />
+          <Skeleton className="h-24 rounded-xl dark:bg-gray-700" />
 
           {/* Cards skeleton */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Skeleton className="h-64 rounded-xl" />
-            <Skeleton className="h-64 rounded-xl" />
+            <Skeleton className="h-64 rounded-xl dark:bg-gray-700" />
+            <Skeleton className="h-64 rounded-xl dark:bg-gray-700" />
           </div>
 
-          <Skeleton className="h-48 rounded-xl" />
+          <Skeleton className="h-48 rounded-xl dark:bg-gray-700" />
         </main>
       </div>
     );
@@ -57,7 +57,7 @@ export function DashboardPage() {
       <div className="min-h-screen bg-crema">
         <header className="bg-white shadow-sm">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-            <h1 className="text-xl font-bold text-gray-900 font-righteous">Portal del Estudiante</h1>
+            <h1 className="text-xl font-bold text-gray-900 dark:text-white font-righteous">Portal del Estudiante</h1>
             <Button variant="gold" size="sm" onClick={handleLogout}>
               Cerrar sesión
             </Button>
@@ -82,7 +82,7 @@ export function DashboardPage() {
       <div className="min-h-screen bg-crema">
         <header className="bg-white shadow-sm">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-            <h1 className="text-xl font-bold text-gray-900 font-righteous">Portal del Estudiante</h1>
+            <h1 className="text-xl font-bold text-gray-900 dark:text-white font-righteous">Portal del Estudiante</h1>
             <Button variant="gold" size="sm" onClick={handleLogout}>
               Cerrar sesión
             </Button>
@@ -105,10 +105,10 @@ export function DashboardPage() {
       {/* Header */}
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <h1 className="text-xl font-bold text-gray-900 font-righteous">Portal del Estudiante</h1>
-          <div className="flex items-center gap-4">
-            <CicloSelector />
-            <span className="text-sm text-gray-600">
+<h1 className="text-xl font-bold text-gray-900 dark:text-white font-righteous">Portal del Estudiante</h1>
+            <div className="flex items-center gap-4">
+              <CicloSelector />
+              <span className="text-sm text-gray-600 dark:text-gray-300">
               {user?.nombre} {user?.apellido}
             </span>
             <Button variant="gold" size="sm" onClick={handleLogout}>

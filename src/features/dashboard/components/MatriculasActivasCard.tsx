@@ -48,7 +48,7 @@ export function MatriculasActivasCard({ matriculas, isLoading }: MatriculasActiv
           <CardTitle>Matrículas Activas</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-gray-500 text-sm text-center py-8">
+          <p className="text-gray-500 dark:text-gray-400 text-sm text-center py-8">
             No tenés matrículas activas en este momento.
           </p>
         </CardContent>
@@ -72,13 +72,13 @@ export function MatriculasActivasCard({ matriculas, isLoading }: MatriculasActiv
           return (
             <div
               key={matricula.id}
-              className="border border-gray-100 rounded-lg p-4 hover:border-gold hover:shadow-sm transition-all cursor-pointer"
+              className="border border-gray-100 dark:border-gray-700 rounded-lg p-4 hover:border-gold hover:shadow-sm transition-all cursor-pointer"
               onClick={() => navigate(`/matriculas/${matricula.id}`)}
             >
               <div className="flex items-start justify-between mb-3">
                 <div>
-                  <h4 className="font-medium text-gray-900">{matricula.taller.nombre}</h4>
-                  <p className="text-sm text-gray-500">{matricula.ciclo_nombre}</p>
+                  <h4 className="font-medium text-gray-900 dark:text-gray-100">{matricula.taller.nombre}</h4>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{matricula.ciclo_nombre}</p>
                 </div>
                 <Badge variant={getSesionesBadgeVariant(matricula.sesiones_disponibles)}>
                   {matricula.sesiones_disponibles} clases
@@ -87,11 +87,11 @@ export function MatriculasActivasCard({ matriculas, isLoading }: MatriculasActiv
 
               {/* Progress bar */}
               <div className="space-y-1">
-                <div className="flex justify-between text-xs text-gray-500">
+                <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
                   <span>{progresoSesiones} clases usadas</span>
                   <span>{matricula.sesiones_contratadas} total</span>
                 </div>
-                <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                <div className="h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
                   <div
                     className={cn(
                       'h-full rounded-full transition-all',

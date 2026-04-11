@@ -49,14 +49,14 @@ export function MatriculasPage() {
       {/* Error state */}
       {error && (
         <div className="text-center py-12">
-          <p className="text-red-600">Error al cargar las matrículas</p>
+          <p className="text-red-600 dark:text-red-400">Error al cargar las matrículas</p>
         </div>
       )}
 
       {/* Empty state */}
       {!isLoading && !error && matriculas?.length === 0 && (
         <div className="text-center py-12">
-          <p className="text-gray-500">
+          <p className="text-gray-500 dark:text-gray-400">
             {activeTab === 'activas'
               ? 'No tenés matrículas activas en este momento.'
               : 'No hay historial de matrículas.'}
