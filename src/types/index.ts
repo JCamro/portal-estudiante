@@ -46,7 +46,10 @@ export interface Asistencia {
   hora: string;
   estado: 'asistio' | 'falta' | 'falta_grave';
   taller_nombre: string;
+  horario_dia?: string;
+  horario_hora?: string;
   profesor_nombre: string;
+  matricula_id?: number;
 }
 
 export interface Horario {

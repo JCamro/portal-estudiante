@@ -31,3 +31,9 @@ coverage/
 # Skills (not part of this project)
 .agents/
 .skills/
+
+# SDD context (generated)
+.sdd-context.json
+
+# SDD artifacts
+.sdd/

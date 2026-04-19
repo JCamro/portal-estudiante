@@ -1,20 +1,21 @@
-import axios from 'axios';
-import { useAuthStore } from '@/features/auth/store/authStore';
+import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
+import { useAuthStore } from '../stores/authStore';
+
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000',
-  timeout: 10000,
+  baseURL: BASE_URL,
+  withCredentials: false,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// Request interceptor: adjunta JWT del store en memoria (NO localStorage)
+// Request interceptor: attach access token
 api.interceptors.request.use(
-  (config) => {
-    // Zustand: getState() da el estado actual sin hook
+  (config: InternalAxiosRequestConfig) => {
     const token = useAuthStore.getState().accessToken;
-    if (token) {
+    if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
@@ -22,34 +23,45 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor: maneja 401 con logout del store
+// Response interceptor: handle 401 → refresh token
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      // Token expirado o inválido - logout y redirect
-      useAuthStore.getState().logout();
-      // Solo redirigir si no estamos ya en login
-      if (!window.location.pathname.includes('/login')) {
+  async (error: AxiosError) => {
+    const originalRequest = error.config as InternalAxiosRequestConfig & {
+      _retry?: boolean;
+    };
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      const refreshToken = useAuthStore.getState().refreshToken;
+      if (!refreshToken) {
+        useAuthStore.getState().clearAuth();
         window.location.href = '/login';
+        return Promise.reject(error);
+      }
+
+      try {
+        const response = await axios.post(`${BASE_URL}/portal/auth/refresh/`, {
+          refresh: refreshToken,
+        });
+
+        const { access } = response.data;
+        useAuthStore.getState().setTokens(access, refreshToken);
+
+        if (originalRequest.headers) {
+          originalRequest.headers.Authorization = `Bearer ${access}`;
+        }
+        return api(originalRequest);
+      } catch {
+        useAuthStore.getState().clearAuth();
+        window.location.href = '/login';
+        return Promise.reject(error);
       }
     }
+
     return Promise.reject(error);
   }
 );
-
-// Helper para usar en casos especiales (ej: refresh token)
-export const getAuthToken = () => useAuthStore.getState().accessToken;
-export const setAuthTokens = (access: string, refresh?: string) => {
-  useAuthStore.setState({ accessToken: access });
-  if (refresh) useAuthStore.setState({ refreshToken: refresh });
-};
-export const clearAuthTokens = () => {
-  useAuthStore.setState({
-    accessToken: null,
-    refreshToken: null,
-    isAuthenticated: false,
-  });
-};
 
 export default api;

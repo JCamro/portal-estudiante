@@ -9,17 +9,116 @@
 
 | Capa                | Tecnología                                  |
 | ------------------- | ------------------------------------------- |
-| **Framework**       | React 18 + TypeScript                       |
-| **Bundler**         | Vite 5                                      |
-| **Estilos**         | Tailwind CSS 3 (dark mode: `class`)         |
-| **Estado global**   | Zustand 4 con devtools                      |
-| **Estado servidor** | TanStack Query v5                           |
-| **Routing**         | React Router v6                             |
-| **Formularios**     | React Hook Form + Zod + @hookform/resolvers |
+| **Framework**       | React 19 + TypeScript 5.9                   |
+| **Bundler**         | Vite 6                                      |
+| **Estilos**         | CSS Variables + Inline Styles (NO Tailwind) |
+| **Estado global**   | Zustand 5 (sin devtools)                    |
+| **Routing**         | React Router v7                             |
 | **HTTP Client**     | Axios con interceptores JWT                 |
-| **Icons**           | Lucide React                                |
-| **Linting**         | ESLint + TypeScript plugin                  |
-| **Formatting**      | Prettier                                    |
+| **Idioma**          | Español (todo UI en español)                |
+| **Timezone**        | `America/Lima`                              |
+
+---
+
+## Arquitectura del Proyecto
+
+```
+portal-estudiante/
+├── public/
+│   └── logo-taller.png          # Logo del Taller de Música Elguera
+├── src/
+│   ├── api/
+│   │   ├── axios.ts             # Axios instance con interceptores JWT (auto-refresh)
+│   │   └── portal.ts            # API functions + TypeScript interfaces
+│   ├── components/
+│   │   ├── detail/              # Tabs de detalle de matrícula
+│   │   │   ├── InfoTab.tsx      # Info general + progreso de sesiones
+│   │   │   ├── HorariosTab.tsx  # Grid de horarios semanal
+│   │   │   ├── AsistenciaTab.tsx # Registro de asistencias
+│   │   │   └── PagosTab.tsx     # Recibos y pagos
+│   │   ├── enrollment/          # Componentes de matrícula
+│   │   │   └── EnrollmentCard.tsx
+│   │   └── layout/              # Layout components
+│   │       ├── Header.tsx       # Header con selector de ciclo + hamburger
+│   │       └── MobileDrawer.tsx # Drawer de navegación móvil
+│   ├── hooks/
+│   │   └── useWindowWidth.ts    # Hook para breakpoint detection
+│   ├── pages/
+│   │   ├── LoginPage.tsx        # Login con DNI
+│   │   ├── DashboardHome.tsx    # Home con grid semanal + tarjetas de matrícula
+│   │   └── EnrollmentDetail.tsx # Detalle de matrícula con 4 tabs
+│   ├── stores/
+│   │   └── authStore.ts         # Zustand auth store (en memoria, NO localStorage)
+│   ├── styles/
+│   │   └── globals.css          # Design system con CSS variables
+│   ├── utils/
+│   │   ├── timezone.ts          # UTC↔Lima date helpers
+│   │   └── formatters.ts        # Shared formatters (formatMonto)
+│   ├── AppShell.tsx             # Router + ProtectedRoute
+│   ├── main.tsx                 # Vite entry point
+│   └── index.css                # Reset + base styles
+├── index.html
+├── package.json
+├── tsconfig.json
+└── vite.config.ts
+```
+
+---
+
+## Design System (CSS Variables)
+
+```css
+/* Colores - Paleta oscura elegante */
+--color-bg: #f9fafb;              /* Fondo principal */
+--color-surface: #ffffff;         /* Cards, modals */
+--color-surface-hover: #f3f4f6;   /* Hover state */
+--color-border: #e5e7eb;          /* Bordes */
+--color-text: #111827;            /* Texto principal */
+--color-text-secondary: #6b7280;  /* Texto secundario */
+--color-text-muted: #9ca3af;      /* Texto muted */
+--color-text-inverse: #ffffff;    /* Texto sobre fondos oscuros */
+
+/* Sidebar/Header - Fondo oscuro */
+--color-sidebar: #0a0a0a;         /* Fondo sidebar */
+--color-sidebar-hover: #141414;   /* Hover sidebar */
+
+/* Acento dorado */
+--color-gold: #D4AF37;
+--color-gold-light: #E5C158;
+--color-gold-dark: #B8962E;
+--color-gold-border: rgba(212, 175, 55, 0.3);
+
+/* Estados */
+--color-success: #10b981;
+--color-success-bg: rgba(16, 185, 129, 0.1);
+--color-warning: #f59e0b;
+--color-warning-bg: rgba(245, 158, 11, 0.1);
+--color-error: #ef4444;
+--color-error-bg: rgba(239, 68, 68, 0.1);
+
+/* Tipografía */
+--font-heading: 'Righteous', cursive;
+--font-body: 'Poppins', sans-serif;
+
+/* Espaciado */
+--space-1: 0.25rem;
+--space-2: 0.5rem;
+--space-3: 0.75rem;
+--space-4: 1rem;
+--space-5: 1.25rem;
+--space-6: 1.5rem;
+--space-8: 2rem;
+
+/* Border radius */
+--radius-sm: 0.375rem;
+--radius-md: 0.5rem;
+--radius-lg: 0.75rem;
+--radius-xl: 1rem;
+
+/* Breakpoints */
+--breakpoint-sm: 480px;
+--breakpoint-md: 768px;
+```
 
 ---
 
@@ -27,66 +126,161 @@
 
 ### Commits
 
-- Conventional commits: `feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `test:`
+- Conventional commits: `feat:`, `fix:`, `chore:`, `docs:`, `refactor:`
 - NUNCA agregar "Co-Authored-By" o atribución IA
-- Formato: `tipo(alcance): descripción` (ej: `feat(auth): add login with JWT`)
+- Solo commit cuando el usuario lo pida explícitamente
 
 ### Código
 
-- **Build**: No ejecutar `build` después de cambios — delegar a CI/CD
-- **TypeScript**: Strict mode. NUNCA usar `any`. Tipos explícitos siempre.
-- **Prettier**: Ancho de línea 100, single quotes, trailing commas ES5, semicolons
-- **ESLint**: `@typescript-eslint/no-unused-vars`: warn con `argsIgnorePattern: "^_"`
-- **Imports**: Usar alias `@/` para `src/` (ej: `@/features/auth`)
+- **Build**: NUNCA ejecutar build después de cambios (delegar al usuario)
+- **TypeScript**: Strict mode. Tipos explícitos siempre.
+- **Idioma**: Todo UI en español. Nombres de variables en inglés, labels en español.
+- **Estilos**: CSS variables + inline styles. NO Tailwind, NO CSS modules.
+- **Performance**: TODOS los componentes de página envueltos en `memo()`
 
 ### Seguridad
 
-- Tokens JWT se almacenan en memoria (Zustand store), NUNCA en localStorage
-- API URLs: validar que use HTTPS en producción (ADVERTENCIA en consola si no)
-- Mensajes de error genéricos en autenticación — no filtrar información
+- Tokens JWT en memoria (Zustand store), NO localStorage
+- `localStorage` solo como fallback con try-catch (falla en private mode)
+- Axios interceptor maneja auto-refresh de tokens
 
 ---
 
-## Arquitectura del Proyecto
+## API Backend (sistema-asistencia-taller)
+
+El portal consume la API del backend Django en `sistema-asistencia-taller/`.
+
+### Base URL
 
 ```
-src/
-├── features/                    # Feature-based modules
-│   ├── auth/                    # Login, logout, ProtectedRoute
-│   │   ├── api/                 # authApi (axios instance)
-│   │   ├── components/          # LoginForm
-│   │   ├── hooks/              # useAuth (custom hook)
-│   │   ├── pages/              # LoginPage
-│   │   ├── store/              # authStore (Zustand)
-│   │   └── types/              # AuthStore, LoginRequest
-│   ├── dashboard/              # Home del estudiante
-│   │   ├── api/
-│   │   ├── components/         # Cards: Greeting, MatriculasActivas, etc.
-│   │   ├── hooks/
-│   │   ├── pages/
-│   │   └── types/
-│   ├── matriculas/             # Gestión de matrículas
-│   ├── asistencia/              # Control de asistencia
-│   ├── horarios/               # Horarios por semana
-│   └── pagos/                  # Estados de cuenta
-├── components/
-│   ├── ui/                     # Componentes base: Button, Input, Card, Badge, Alert, Label, Skeleton
-│   ├── layout/                 # Layout, Navbar, ThemeToggle
-│   └── shared/                 # Compartidos: DataTable, FilterTabs, SectionHeader, EmptyState, ProgressBar
-├── hooks/                      # Custom hooks globales
-├── stores/                     # Stores globales (themeStore)
-├── api/                        # Axios instance con interceptores JWT
-├── lib/                        # Utils: cn() para Tailwind, formatDate(), etc.
-└── types/                      # Tipos globales compartidos (Alumno, Ciclo, Matricula, etc.)
+VITE_API_URL=http://localhost:8000/api  (default)
 ```
 
-### Principios de Arquitectura
+### Endpoints del Portal
 
-1. **Feature-based**: Cada feature es autocontenida con su propia lógica
-2. **Separación de concerns**: pages → components → hooks → api → store
-3. **Estado**: Zustand para estado global (auth, theme), TanStack Query para estado servidor
-4. **Componentes UI**: Dumb components, sin lógica de negocio
-5. **Custom Hooks**: Encapsulan lógica reutilizable
+```
+POST /api/portal/auth/login/              # Login con DNI (retorna tokens + user + ciclos)
+POST /api/portal/auth/refresh/            # Refresh token
+POST /api/portal/auth/logout/             # Blacklist token
+GET  /api/portal/me/                      # Perfil del estudiante
+GET  /api/portal/me/matriculas/?ciclo_id=X  # Matrículas (activas + concluidas)
+GET  /api/portal/me/horarios/?ciclo_id=X   # Horarios del ciclo
+GET  /api/portal/me/asistencias/?ciclo_id=X # Asistencias del ciclo
+GET  /api/portal/me/pagos/?ciclo_id=X      # Recibos del ciclo
+GET  /api/portal/me/dashboard/?ciclo_id=X  # Stats del dashboard
+```
+
+### Campos Importantes del Backend
+
+**Matriculas response:**
+```json
+{
+  "activas": [...],
+  "concluidas": [...]
+}
+```
+Cada matrícula:
+```json
+{
+  "id": 1,
+  "taller": { "id": 1, "nombre": "Guitarra", "tipo": "instrumento" },
+  "ciclo_nombre": "2024-I",
+  "sesiones_contratadas": 12,
+  "sesiones_disponibles": 8,
+  "sesiones_consumidas": 4,
+  "concluida": false,
+  "precio_total": "240.00",
+  "fecha_matricula": "2024-01-15"
+}
+```
+
+**Asistencias response:**
+```json
+{
+  "id": 1,
+  "fecha": "2024-01-15",
+  "hora": "10:00",
+  "estado": "asistio",
+  "taller_nombre": "Guitarra",
+  "horario_dia": "Lunes",
+  "horario_hora": "10:00-11:00",
+  "profesor_nombre": "Pérez, Juan"
+}
+```
+⚠️ **NO incluye `matricula_id`** — filtrar por `taller_nombre` en frontend.
+
+**Pagos/Recibos response:**
+```json
+{
+  "id": 1,
+  "numero": "REC-2024-0001",
+  "monto_total": "290.00",
+  "monto_pagado": "0.00",
+  "saldo_pendiente": "290.00",
+  "estado": "pendiente",
+  "fecha_emision": "2024-01-15",
+  "porcentaje_descuento": 9.4,
+  "paquetes": ["Guitarra", "Batería"]
+}
+```
+⚠️ **`paquetes` es un array de nombres de talleres**, no un string.
+
+---
+
+## Patrones Establecidos
+
+### Autenticación
+
+```tsx
+// Login flow
+1. POST /portal/auth/login/ { dni } → { access, refresh, user, ciclos }
+2. Guardar tokens en Zustand store (en memoria)
+3. Si 1 ciclo → seleccionar automáticamente y ir a /
+4. Si múltiples ciclos → ir a / para selección
+
+// Protected routes
+- Verificar: isAuthenticated + accessToken + refreshToken + user
+- NO verificar cicloActivo (ese es para páginas internas)
+```
+
+### Filtro de Datos por Matrícula
+
+Como el backend NO devuelve `matricula_id` en asistencias:
+
+```tsx
+// Filtrar por taller_nombre
+const filteredAttendance = useMemo(() => {
+  if (!enrollment?.taller?.nombre) return [];
+  return allAttendance.filter((a) => a.taller_nombre === enrollment.taller.nombre);
+}, [allAttendance, enrollment]);
+```
+
+### Responsive Design
+
+```tsx
+// Breakpoints
+- Mobile: < 480px → Cards, single column
+- Tablet: 480px – 768px → Cards, 1-2 columns
+- Desktop: > 768px → Full table layout
+
+// Componentes
+- useWindowWidth() → hook para JS-side breakpoints
+- ResponsiveTable → Table on desktop, cards on mobile (threshold: 768px)
+- DataCard → Sub-component for mobile card rows
+
+// Touch targets
+- Mínimo 44px height para elementos interactivos
+- Clase CSS: .touch-target
+```
+
+### Navigation Flow
+
+```
+Login → / (selección de ciclo si hay múltiples) → / → Dashboard → sidebar
+```
+
+- Al cambiar ciclo → navegar a `/` para evitar errores "No encontrado"
+- Hamburger menu en móvil → MobileDrawer con navegación + selector de ciclo
 
 ---
 
@@ -96,199 +290,119 @@ src/
 
 | Elemento          | Convención          | Ejemplo                                |
 | ----------------- | ------------------- | -------------------------------------- |
-| Archivos          | kebab-case          | `useAuth.ts`, `login-form.tsx`         |
-| Componentes React | PascalCase          | `LoginForm.tsx`, `MatriculaCard.tsx`   |
-| Hooks             | camelCase con `use` | `useAuth.ts`, `useMatriculas.ts`       |
-| Stores Zustand    | camelCase con `use` | `useAuthStore.ts`, `useThemeStore.ts`  |
-| Funciones util    | camelCase           | `formatDate()`, `cn()`                 |
-| Types/Interfaces  | PascalCase          | `Alumno`, `Matricula`, `AuthState`     |
-| Rutas API         | kebab-case          | `matriculasApi.ts`, `asistenciaApi.ts` |
+| Archivos          | PascalCase (tsx)    | `LoginPage.tsx`, `EnrollmentCard.tsx`  |
+| Archivos utils    | camelCase (ts)      | `formatters.ts`, `timezone.ts`         |
+| Componentes React | PascalCase          | `Header.tsx`, `PagosTab.tsx`           |
+| Hooks             | camelCase con `use` | `useWindowWidth.ts`                    |
+| Stores Zustand    | camelCase           | `authStore.ts`                         |
+| Funciones util    | camelCase           | `formatMonto()`, `formatDate()`        |
+| Types/Interfaces  | PascalCase          | `PaymentRecord`, `EnrollmentRecord`    |
 
 ### Componentes React
 
 ```tsx
-// Estructura esperada
-import { type FC } from 'react';
-import { cn } from '@/lib/utils';
+// Estructura estándar
+import React, { memo } from 'react';
 
 interface Props {
-  className?: string;
+  // props
 }
 
-export const ComponentName: FC<Props> = ({ className }) => {
-  return <div className={cn('base-class', className)}>{/* contenido */}</div>;
+const ComponentName: React.FC<Props> = ({ /* props */ }) => {
+  return (
+    <div>
+      {/* contenido */}
+      <style>{`
+        .className {
+          /* estilos */
+        }
+      `}</style>
+    </div>
+  );
 };
+
+export default memo(ComponentName);
 ```
 
-### Imports
-
-```tsx
-// Orden recomendado
-import { type FC } from 'react'; // React
-import { useState, useEffect } from 'react'; // React hooks
-import { cn } from '@/lib/utils'; // Utils
-import { useAuthStore } from '@/features/auth/store/authStore'; // Stores
-import { Button } from '@/components/ui/Button'; // Components
-import { LoginPage } from '@/features/auth'; // Features/barrel
-```
-
-### Zustand Store
+### Zustand Store (sin devtools)
 
 ```typescript
-// Estructura de store
-export const useAuthStore = create<AuthStore>()(
-  devtools(
-    (set, get) => ({
-      // State
-      accessToken: null,
-      user: null,
-      isAuthenticated: false,
+// authStore.ts
+import { create } from 'zustand';
 
-      // Actions
-      login: async (dni: string) => {
-        /* ... */
-      },
-      logout: () => {
-        /* ... */
-      },
-    }),
-    { name: 'auth-store' } // Para devtools
-  )
-);
+interface AuthState {
+  // State
+  accessToken: string | null;
+  user: User | null;
+  cicloActivo: Ciclo | null;
+  
+  // Actions
+  setTokens: (access: string, refresh: string) => void;
+  setUser: (user: User) => void;
+  logout: () => void;
+}
+
+export const useAuthStore = create<AuthState>((set) => ({
+  // Initial state
+  accessToken: null,
+  user: null,
+  cicloActivo: null,
+  
+  // Actions
+  setTokens: (access, refresh) => set({ accessToken: access }),
+  setUser: (user) => set({ user }),
+  logout: () => set({ accessToken: null, user: null, ciclos: [], cicloActivo: null }),
+}));
 ```
 
 ### API Layer (Axios)
 
 ```typescript
-// Endpoints: features/{feature}/api/{feature}Api.ts
-// Usar api instance de @/api/axios (ya tiene interceptores JWT)
-import api from '@/api/axios';
-import type { Matricula } from '@/types';
+// api/portal.ts
+import api from './axios';
 
-export const matriculasApi = {
-  getAll: async (): Promise<Matricula[]> => {
-    const { data } = await api.get('/matriculas/');
-    return data.results;
-  },
+export interface PaymentRecord {
+  id: number;
+  numero: string;
+  monto_total: string;
+  // ... otros campos
+}
+
+export const getPayments = async (cicloId: number): Promise<PaymentRecord[]> => {
+  const response = await api.get<PaymentRecord[]>(
+    `/portal/me/pagos/?ciclo_id=${cicloId}`
+  );
+  return response.data;
 };
-```
-
----
-
-## Patrones Establecidos
-
-### Dark Mode
-
-```tsx
-// Theme store ya configurado en src/stores/themeStore.ts
-// UI ya configurada con dark:前缀
-// Toggle disponible en ThemeToggle component
-
-// En componentes:
-<div className="dark:bg-gray-900">{/* Se adapta automáticamente */}</div>
-```
-
-### Autenticación (JWT en memoria)
-
-```tsx
-// Login: usa useAuthStore.login(dni)
-// Tokens: almacenados en memory (Zustand), NO localStorage
-// Redirect: 401 → logout + redirect a /login
-// HTTPS: advertencia en consola si API usa HTTP en PROD
-
-const { isAuthenticated, user } = useAuth();
-```
-
-### Formularios con React Hook Form + Zod
-
-```typescript
-// Schema de validación
-import { z } from 'zod';
-
-export const loginSchema = z.object({
-  dni: z.string().min(8, 'DNI debe tener 8 dígitos'),
-});
-```
-
-### Fetching con TanStack Query
-
-```typescript
-// Hook de data fetching
-export const useMatriculas = () => {
-  return useQuery({
-    queryKey: ['matriculas'],
-    queryFn: matriculasApi.getAll,
-    staleTime: 5 * 60 * 1000, // 5 minutos
-  });
-};
-```
-
-### cn() — Tailwind Classes
-
-```tsx
-// Usar SIEMPRE cn() para combinar clases
-import { cn } from '@/lib/utils';
-
-// Bien
-<Button className={cn('px-4', isActive && 'bg-blue-500')} />
-
-// Mal
-<Button className={`px-4 ${isActive ? 'bg-blue-500' : ''}`} />
-```
-
-### Tipos Globales (src/types/index.ts)
-
-```typescript
-// Tipos compartidos entre features
-// Alumno, Ciclo, Matricula, Asistencia, Horario, Pago
-// ApiResponse<T> para paginación
 ```
 
 ---
 
 ## Habilidades del Proyecto (Auto-load)
 
-Cuando el contexto involucre estas tecnologías, CARGAR la skill correspondiente ANTES de escribir código.
-
-| Contexto                                                     | Skill                                                               |
-| ------------------------------------------------------------ | ------------------------------------------------------------------- |
-| React performance, re-renders, memo                          | `vercel-react-best-practices` (ya configurada en `.agents/skills/`) |
-| Testing de componentes React                                 | `vercel-react-best-practices` (secciones testing)                   |
-| UI/UX, diseño de interfaces, colors, typography, componentes | `ui-ux-pro-max` (`.agents/skills/ui-ux-pro-max/`)                   |
+| Contexto                                    | Skill                                    |
+| ------------------------------------------- | ---------------------------------------- |
+| React performance, re-renders, memo         | `vercel-react-best-practices`            |
+| UI/UX, diseño de interfaces                 | `frontend-design`                        |
+| Diseño de interfaces web                    | `ui-ux-pro-max`                          |
 
 ---
 
-## SDD — Spec-Driven Development
-
-### Inicialización
-
-Antes de usar cualquier comando SDD, verificar que `sdd-init` haya sido ejecutado:
-
-1. Buscar en Engram: `sdd-init/portal-estudiante`
-2. Si no existe → delegar a `sdd-init` sub-agent primero
-3. Solo entonces proceder con comandos SDD
-
-### Workflow
-
-```
-proposal → specs → design → tasks → apply → verify → archive
-```
-
-### Engram Persistence (Obligatorio)
+## Engram Persistence (Obligatorio)
 
 **Guardar SIEMPRE después de:**
 
 - Decisiones de arquitectura o diseño
 - Bugs corregidos (con root cause)
-- Patrones establecidos (nomenclatura, estructura)
+- Patrones establecidos
 - Descubrimientos no obvios sobre el codebase
-- Preferencias o restricciones del usuario
+- Campos del backend que NO existen (evitar errores futuros)
 
 **Formato:**
 
 ```
 title: "Breve descripción"
-type: bugfix | decision | architecture | discovery | pattern | config
+type: bugfix | decision | architecture | discovery | pattern
 content:
   What: Qué se hizo
   Why: Por qué se tomó esa decisión
@@ -300,23 +414,23 @@ content:
 
 ## Comandos Disponibles
 
-| Comando            | Descripción                          |
-| ------------------ | ------------------------------------ |
-| `npm run dev`      | Iniciar dev server en localhost:5173 |
-| `npm run build`    | Build para producción                |
-| `npm run lint`     | ESLint check                         |
-| `npm run lint:fix` | ESLint auto-fix                      |
+| Comando         | Descripción                          |
+| --------------- | ------------------------------------ |
+| `npm run dev`   | Iniciar dev server en localhost:5173 |
+| `npm run build` | Build para producción                |
+| `npm run lint`  | ESLint check                         |
 
 ---
 
 ## Notas Importantes
 
-- **API Base URL**: Configurable via `VITE_API_URL` (default: `http://localhost:8000`)
-- **Dark Mode**: Implementado con Tailwind `dark:` classes y toggle manual
-- **Pagination**: La API usa estilo Django REST (paginated response con `results`)
-- **LocalStorage**: Solo para tema (`theme`), NO para tokens
-- **ESLint plugins**: `react-hooks/recommended`, `react-refresh`, `@typescript-eslint`
+- **NO ejecutar build** después de cambios — el usuario lo hace
+- **Backend fields**: Verificar campos reales del backend antes de usar
+- **Filtrado**: Backend NO devuelve `matricula_id` en asistencias — usar `taller_nombre`
+- **Pagos**: `paquetes` es array de strings, no un solo string
+- **Ciclo change**: Siempre navegar a `/` después de cambiar ciclo
+- **localStorage**: Siempre wrap en try-catch (falla en private mode)
 
 ---
 
-_Última actualización: Abril 2026_
+_Ultima actualización: Abril 2026_
