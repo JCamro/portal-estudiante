@@ -346,7 +346,7 @@ const DashboardHome: React.FC = () => {
                                     >
                                       <span className="class-taller">{classAtSlot.taller_nombre}</span>
                                       <span className="class-time">{classAtSlot.hora_inicio} - {classAtSlot.hora_fin}</span>
-                                      <span className="class-teacher">{classAtSlot.profesor_nombre}</span>
+                                      <span className="class-teacher">Prof. {classAtSlot.profesor_nombre}</span>
                                     </div>
                                   </div>
                                 );

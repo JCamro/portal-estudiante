@@ -109,7 +109,7 @@ const HorariosTab: React.FC<HorariosTabProps> = ({ schedules }) => {
                             {classAtTime.hora_inicio} - {classAtTime.hora_fin}
                           </span>
                           <span className="class-name">{classAtTime.taller_nombre}</span>
-                          <span className="class-teacher">{classAtTime.profesor_nombre}</span>
+                          <span className="class-teacher">Prof. {classAtTime.profesor_nombre}</span>
                         </div>
                       )}
                     </div>
@@ -152,7 +152,7 @@ const HorariosTab: React.FC<HorariosTabProps> = ({ schedules }) => {
                       {item.taller_nombre}
                     </h4>
                     <div className="schedule-card-meta">
-                      <span className="teacher-name">{item.profesor_nombre}</span>
+                      <span className="teacher-name">Prof. {item.profesor_nombre}</span>
                     </div>
                   </div>
                 ))}
