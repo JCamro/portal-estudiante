@@ -23,6 +23,10 @@ const timeToMinutes = (time: string): number => {
   return hours * 60 + minutes;
 };
 
+const formatHour = (hour: number): string => {
+  return `${hour.toString().padStart(2, '0')}:00`;
+};
+
 const HorariosTab: React.FC<HorariosTabProps> = ({ schedules }) => {
   if (schedules.length === 0) {
     return (
@@ -50,6 +54,17 @@ const HorariosTab: React.FC<HorariosTabProps> = ({ schedules }) => {
     grouped[Number(day)].sort((a, b) => timeToMinutes(a.hora_inicio) - timeToMinutes(b.hora_inicio));
   });
 
+  // Get unique hours from all schedules (for grid rows)
+  const allHours = new Set<number>();
+  schedules.forEach((s) => {
+    const startHour = parseInt(s.hora_inicio.split(':')[0], 10);
+    const endHour = parseInt(s.hora_fin.split(':')[0], 10);
+    for (let h = startHour; h <= endHour; h++) {
+      allHours.add(h);
+    }
+  });
+  const hours = Array.from(allHours).sort((a, b) => a - b);
+
   // Days that have records (excluding Sunday=0)
   const activeDays = [1, 2, 3, 4, 5, 6].filter((d) => grouped[d]?.length > 0);
 
@@ -68,22 +83,17 @@ const HorariosTab: React.FC<HorariosTabProps> = ({ schedules }) => {
           ))}
         </div>
         <div className="schedule-grid-body">
-          {Array.from({ length: 12 }, (_, i) => {
-            const hour = 7 + Math.floor(i / 2);
-            const minute = (i % 2) * 30;
-            const timeStr = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-            const currentMinutes = hour * 60 + minute;
-
+          {hours.map((hour) => {
             return (
-              <div key={i} className="grid-row">
-                <div className="grid-time">{timeStr}</div>
+              <div key={hour} className="grid-row">
+                <div className="grid-time">{formatHour(hour)}</div>
                 {[1, 2, 3, 4, 5, 6].map((dia) => {
                   const classAtTime = grouped[dia]?.find((r) => {
-                    const start = timeToMinutes(r.hora_inicio);
-                    const end = timeToMinutes(r.hora_fin);
-                    return currentMinutes >= start && currentMinutes < end;
+                    const startHour = parseInt(r.hora_inicio.split(':')[0], 10);
+                    const endHour = parseInt(r.hora_fin.split(':')[0], 10);
+                    return hour >= startHour && hour < endHour;
                   });
-                  const isStart = classAtTime && timeToMinutes(classAtTime.hora_inicio) === currentMinutes;
+                  const isStart = classAtTime && parseInt(classAtTime.hora_inicio.split(':')[0], 10) === hour;
 
                   return (
                     <div key={dia} className="grid-cell">
@@ -190,14 +200,14 @@ const HorariosTab: React.FC<HorariosTabProps> = ({ schedules }) => {
         }
 
         .schedule-grid-body {
-          max-height: 400px;
+          max-height: 500px;
           overflow-y: auto;
         }
 
         .grid-row {
           display: grid;
           grid-template-columns: 60px repeat(6, 1fr);
-          min-height: 40px;
+          min-height: 60px;
           border-bottom: 1px solid var(--color-border-light);
         }
 
@@ -207,20 +217,21 @@ const HorariosTab: React.FC<HorariosTabProps> = ({ schedules }) => {
 
         .grid-time {
           padding: var(--space-2);
-          font-size: var(--text-xs);
+          font-size: var(--text-sm);
           font-family: var(--font-heading);
           color: var(--color-text-muted);
           text-align: center;
           border-right: 1px solid var(--color-border-light);
           display: flex;
-          align-items: center;
+          align-items: flex-start;
           justify-content: center;
+          padding-top: var(--space-3);
         }
 
         .grid-cell {
           border-right: 1px solid var(--color-border-light);
           position: relative;
-          min-height: 40px;
+          min-height: 60px;
         }
 
         .grid-cell:last-child {
@@ -232,9 +243,10 @@ const HorariosTab: React.FC<HorariosTabProps> = ({ schedules }) => {
           left: 2px;
           right: 2px;
           top: 2px;
+          bottom: 2px;
           padding: var(--space-2);
           border-radius: var(--radius-sm);
-          border: 1px solid;
+          border: 2px solid;
           display: flex;
           flex-direction: column;
           gap: 2px;
@@ -243,7 +255,7 @@ const HorariosTab: React.FC<HorariosTabProps> = ({ schedules }) => {
         }
 
         .class-time {
-          font-size: 9px;
+          font-size: 10px;
           font-family: var(--font-heading);
           opacity: 0.8;
         }
