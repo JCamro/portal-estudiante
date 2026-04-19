@@ -126,7 +126,7 @@ export const getSchedules = async (cicloId: number): Promise<ScheduleRecord[]> =
 
 export const getPayments = async (cicloId: number): Promise<PaymentRecord[]> => {
   const response = await api.get<PaymentRecord[]>(
-    `/portal/me/pagos/?ciclo_id=${cicloId}`
+    `/portal/me/pagos/?ciclo_id=${cicloId}&filtro=todos`
   );
   return response.data;
 };

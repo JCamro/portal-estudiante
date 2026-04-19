@@ -119,13 +119,18 @@ const EnrollmentDetail: React.FC = () => {
     return allAttendance.filter((a) => a.taller_nombre === enrollment.taller?.nombre);
   }, [allAttendance, enrollment]);
 
-  // Filter payments by taller name (backend returns all payments for the cycle)
+  // Filter payments: show all that match this taller OR have empty paquetes
+  // (backend already filters by student, paquetes can be empty if recibo was edited)
   const filteredPayments = useMemo(() => {
-    if (!enrollment || !enrollment.taller?.nombre) return allPayments;
+    if (!enrollment) return allPayments;
+    if (!enrollment.taller?.nombre) return allPayments;
     const tallerNombre = enrollment.taller.nombre;
-    return allPayments.filter((p) => 
-      p.paquetes && p.paquetes.some((nombre) => nombre === tallerNombre)
-    );
+    return allPayments.filter((p) => {
+      // If paquetes is empty/null (recibo edited, ReciboMatricula deleted), show it anyway
+      if (!p.paquetes || p.paquetes.length === 0) return true;
+      // If paquetes has data, match by taller name
+      return p.paquetes.some((nombre) => nombre === tallerNombre);
+    });
   }, [allPayments, enrollment]);
 
   const handleBack = () => {
