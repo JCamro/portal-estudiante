@@ -4,7 +4,7 @@ import { useAuthStore } from '../../stores/authStore';
 
 interface DrawerItem {
   label: string;
-  section?: 'schedule' | 'talleres';
+  section?: 'schedule' | 'talleres' | 'pagos';
   to?: string;
   icon: React.ReactNode;
 }
@@ -13,7 +13,7 @@ interface MobileDrawerProps {
   isOpen: boolean;
   onClose: () => void;
   items: DrawerItem[];
-  onSectionChange?: (section: 'schedule' | 'talleres') => void;
+  onSectionChange?: (section: 'schedule' | 'talleres' | 'pagos') => void;
 }
 
 const CloseIcon: React.FC<{ size?: number }> = ({ size = 24 }) => (

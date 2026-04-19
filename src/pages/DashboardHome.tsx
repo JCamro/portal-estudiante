@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
-import { getEnrollments, getSchedules, EnrollmentsResponse, ScheduleRecord } from '../api/portal';
+import { getEnrollments, getSchedules, getPayments, EnrollmentsResponse, ScheduleRecord, PaymentRecord } from '../api/portal';
 import Header from '../components/layout/Header';
 import MobileDrawer from '../components/layout/MobileDrawer';
 import EnrollmentCard from '../components/enrollment/EnrollmentCard';
@@ -39,9 +39,10 @@ const DashboardHome: React.FC = () => {
 
   const [enrollments, setEnrollments] = useState<EnrollmentsResponse>({ activas: [], concluidas: [] });
   const [schedules, setSchedules] = useState<ScheduleRecord[]>([]);
+  const [payments, setPayments] = useState<PaymentRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState<'schedule' | 'talleres'>('schedule');
+  const [activeSection, setActiveSection] = useState<'schedule' | 'talleres' | 'pagos'>('schedule');
 
   // Auto-select ciclo if only one exists
   useEffect(() => {
@@ -62,19 +63,22 @@ const DashboardHome: React.FC = () => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const [enrollmentsData, schedulesData] = await Promise.all([
+        const [enrollmentsData, schedulesData, paymentsData] = await Promise.all([
           getEnrollments(cicloActivo.id),
           getSchedules(cicloActivo.id),
+          getPayments(cicloActivo.id),
         ]);
         if (!cancelled) {
           setEnrollments(enrollmentsData);
           setSchedules(schedulesData);
+          setPayments(paymentsData);
         }
       } catch (error) {
         console.error('Error fetching data:', error);
         if (!cancelled) {
           setEnrollments({ activas: [], concluidas: [] });
           setSchedules([]);
+          setPayments([]);
         }
       } finally {
         if (!cancelled) {
@@ -125,6 +129,16 @@ const DashboardHome: React.FC = () => {
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
           <polyline points="22 4 12 14.01 9 11.01" />
+        </svg>
+      ),
+    },
+    {
+      label: 'Mis Pagos',
+      section: 'pagos' as const,
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+          <line x1="1" y1="10" x2="23" y2="10" />
         </svg>
       ),
     },
@@ -217,7 +231,7 @@ const DashboardHome: React.FC = () => {
         isOpen={mobileMenuOpen}
         onClose={() => setMobileMenuOpen(false)}
         items={drawerItems}
-        onSectionChange={(section) => setActiveSection(section as 'schedule' | 'talleres')}
+        onSectionChange={(section) => setActiveSection(section as 'schedule' | 'talleres' | 'pagos')}
       />
 
       <main className="dashboard-content">
@@ -251,6 +265,16 @@ const DashboardHome: React.FC = () => {
                   <polyline points="22 4 12 14.01 9 11.01" />
                 </svg>
                 Mis Talleres
+              </button>
+              <button
+                className={`toggle-btn ${activeSection === 'pagos' ? 'active' : ''}`}
+                onClick={() => setActiveSection('pagos')}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+                  <line x1="1" y1="10" x2="23" y2="10" />
+                </svg>
+                Mis Pagos
               </button>
             </div>
 
@@ -407,6 +431,83 @@ const DashboardHome: React.FC = () => {
                 )}
               </section>
             )}
+
+            {/* Pagos Section */}
+            {activeSection === 'pagos' && (
+              <section className="pagos-section animate-fade-in">
+                <div className="section-header">
+                  <h2>Mis Pagos</h2>
+                  <p>Historial de recibos y pagos</p>
+                </div>
+
+                {/* Summary Cards */}
+                <div className="payments-summary">
+                  <div className="summary-card summary-pending">
+                    <div className="summary-icon warning">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                        <line x1="12" y1="9" x2="12" y2="13" />
+                        <line x1="12" y1="17" x2="12.01" y2="17" />
+                      </svg>
+                    </div>
+                    <div className="summary-content">
+                      <h3>Pendiente</h3>
+                      <p className="summary-amount">
+                        S/. {payments.filter((p) => p.estado === 'pendiente').reduce((sum, p) => sum + parseFloat(p.saldo_pendiente || '0'), 0).toFixed(2)}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="summary-card summary-paid">
+                    <div className="summary-icon success">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                    </div>
+                    <div className="summary-content">
+                      <h3>Pagado</h3>
+                      <p className="summary-amount">
+                        S/. {payments.filter((p) => p.estado === 'pagado').reduce((sum, p) => sum + parseFloat(p.monto_pagado || '0'), 0).toFixed(2)}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Payments List */}
+                {payments.length === 0 ? (
+                  <div className="empty-state">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                      <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+                      <line x1="1" y1="10" x2="23" y2="10" />
+                    </svg>
+                    <p>No hay recibos registrados para este ciclo.</p>
+                  </div>
+                ) : (
+                  <div className="payments-list">
+                    {payments.map((payment) => (
+                      <div key={payment.id} className={`payment-card ${payment.estado === 'pendiente' ? 'payment-pending' : ''}`}>
+                        <div className="payment-header">
+                          <span className="payment-number">{payment.numero}</span>
+                          <span className={`payment-status ${payment.estado}`}>
+                            {payment.estado === 'pagado' ? 'Pagado' : payment.estado === 'pendiente' ? 'Pendiente' : 'Anulado'}
+                          </span>
+                        </div>
+                        {payment.paquetes && payment.paquetes.length > 0 && (
+                          <p className="payment-talleres">
+                            {payment.paquetes.join(' + ')}
+                          </p>
+                        )}
+                        <div className="payment-footer">
+                          <span className="payment-date">
+                            {new Date(payment.fecha_emision + 'T00:00:00').toLocaleDateString('es-PE', { day: 'numeric', month: 'short', year: 'numeric' })}
+                          </span>
+                          <span className="payment-amount">S/. {parseFloat(payment.monto_total).toFixed(2)}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </section>
+            )}
           </>
         )}
       </main>
@@ -497,6 +598,31 @@ const DashboardHome: React.FC = () => {
         .group-title { display: flex; align-items: center; gap: var(--space-2); font-family: var(--font-heading); font-size: var(--text-lg); color: var(--color-text); }
         .group-title.concluded { color: var(--color-text-secondary); }
         .enrollment-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--space-4); }
+
+        /* Pagos Section */
+        .pagos-section { display: flex; flex-direction: column; gap: var(--space-5); }
+        .payments-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4); margin-bottom: var(--space-4); }
+        .summary-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-4); display: flex; align-items: center; gap: var(--space-3); }
+        .summary-icon { width: 40px; height: 40px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .summary-icon.warning { background: var(--color-warning-bg); color: #92400e; }
+        .summary-icon.success { background: var(--color-success-bg); color: #166534; }
+        .summary-content h3 { font-size: var(--text-xs); color: var(--color-text-secondary); margin: 0; text-transform: uppercase; letter-spacing: 0.04em; }
+        .summary-amount { font-family: var(--font-heading); font-size: var(--text-xl); color: var(--color-text); margin: var(--space-1) 0 0; }
+        
+        .payments-list { display: flex; flex-direction: column; gap: var(--space-3); }
+        .payment-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-4); transition: all var(--transition-fast); }
+        .payment-card:hover { border-color: var(--color-gold-border); }
+        .payment-card.payment-pending { border-left: 3px solid #eab308; }
+        .payment-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-2); }
+        .payment-number { font-family: var(--font-heading); font-size: var(--text-sm); color: var(--color-text); }
+        .payment-status { font-size: var(--text-xs); font-weight: 600; padding: var(--space-1) var(--space-2); border-radius: var(--radius-sm); }
+        .payment-status.pagado { background: var(--color-success-bg); color: #166534; }
+        .payment-status.pendiente { background: var(--color-warning-bg); color: #92400e; }
+        .payment-status.anulado { background: var(--color-surface-hover); color: #666; }
+        .payment-talleres { font-size: var(--text-xs); color: var(--color-text-secondary); margin: 0 0 var(--space-2); }
+        .payment-footer { display: flex; justify-content: space-between; align-items: center; }
+        .payment-date { font-size: var(--text-xs); color: var(--color-text-muted); }
+        .payment-amount { font-family: var(--font-heading); font-size: var(--text-lg); color: var(--color-text); }
 
         .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: var(--space-12); text-align: center; color: var(--color-text-muted); }
         .empty-state svg { margin-bottom: var(--space-4); opacity: 0.5; }
