@@ -34,6 +34,7 @@ export interface AttendanceRecord {
   horario_dia: string;
   horario_hora: string;
   profesor_nombre: string;
+  matricula: number;
 }
 
 export interface ScheduleRecord {
@@ -55,7 +56,8 @@ export interface PaymentRecord {
   estado: 'pendiente' | 'pagado' | 'anulado';
   fecha_emision: string;
   porcentaje_descuento: number;
-  paquetes: string[]; // Nombres de talleres incluidos en el recibo
+  paquetes: string[];
+  matricula_ids: number[];
 }
 
 export interface TallerInfo {
@@ -72,6 +74,7 @@ export interface EnrollmentRecord {
   sesiones_disponibles: number;
   sesiones_consumidas: number;
   concluida: boolean;
+  estado_calculado?: 'activa' | 'no_procesado';
   precio_total: string;
   fecha_matricula: string;
 }

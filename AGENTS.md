@@ -204,10 +204,11 @@ Cada matrícula:
   "taller_nombre": "Guitarra",
   "horario_dia": "Lunes",
   "horario_hora": "10:00-11:00",
-  "profesor_nombre": "Pérez, Juan"
+  "profesor_nombre": "Pérez, Juan",
+  "matricula": 42
 }
 ```
-⚠️ **NO incluye `matricula_id`** — filtrar por `taller_nombre` en frontend.
+✅ **Incluye `matricula` (FK numérico)** — filtrar por `matricula` en frontend para evitar mezclar asistencias de matrículas del mismo taller.
 
 **Pagos/Recibos response:**
 ```json
@@ -245,13 +246,13 @@ Cada matrícula:
 
 ### Filtro de Datos por Matrícula
 
-Como el backend NO devuelve `matricula_id` en asistencias:
+El backend ahora devuelve `matricula` (FK numérico) en cada registro de asistencia:
 
 ```tsx
-// Filtrar por taller_nombre
+// Filtrar por matricula_id (preciso, soporta re-matrículas del mismo taller)
 const filteredAttendance = useMemo(() => {
-  if (!enrollment?.taller?.nombre) return [];
-  return allAttendance.filter((a) => a.taller_nombre === enrollment.taller.nombre);
+  if (!enrollment) return [];
+  return allAttendance.filter((a) => a.matricula === enrollment.id);
 }, [allAttendance, enrollment]);
 ```
 

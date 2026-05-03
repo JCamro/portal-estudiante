@@ -32,6 +32,7 @@ const EnrollmentCard: React.FC<EnrollmentCardProps> = ({ enrollment, onClick }) 
     ? Math.round((enrollment.sesiones_consumidas / enrollment.sesiones_contratadas) * 100)
     : 0;
   const colors = tipoColors[enrollment.taller?.tipo] ?? tipoColors.instrumento;
+  const isNoProcesado = enrollment.estado_calculado === 'no_procesado';
 
   return (
     <button className="enrollment-card" onClick={onClick}>
@@ -47,16 +48,37 @@ const EnrollmentCard: React.FC<EnrollmentCardProps> = ({ enrollment, onClick }) 
         >
           {tipoLabel[enrollment.taller?.tipo] ?? enrollment.taller?.tipo ?? 'Taller'}
         </span>
-        {enrollment.concluida && (
-          <span className="concluded-badge">Culminada</span>
-        )}
+        <div className="enrollment-badges">
+          {isNoProcesado && (
+            <span className="no-procesado-badge">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="12" />
+                <line x1="12" y1="16" x2="12.01" y2="16" />
+              </svg>
+              Sin procesar
+            </span>
+          )}
+          {enrollment.concluida && (
+            <span className="concluded-badge">Culminada</span>
+          )}
+        </div>
       </div>
 
       {/* Taller Name */}
       <h3 className="enrollment-taller">{enrollment.taller?.nombre ?? 'Taller'}</h3>
 
-      {/* Sessions Progress */}
-      {!enrollment.concluida && (
+      {/* Sessions Progress or No Procesado message */}
+      {isNoProcesado ? (
+        <div className="no-procesado-notice">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          Secretaría aún no genera tu recibo
+        </div>
+      ) : !enrollment.concluida && (
         <div className="sessions-progress">
           <div className="progress-header">
             <span className="progress-label">Sesiones</span>
@@ -121,6 +143,12 @@ const EnrollmentCard: React.FC<EnrollmentCardProps> = ({ enrollment, onClick }) 
           gap: var(--space-3);
         }
 
+        .enrollment-badges {
+          display: flex;
+          align-items: center;
+          gap: var(--space-2);
+        }
+
         .tipo-badge {
           font-size: 10px;
           font-weight: 600;
@@ -129,6 +157,20 @@ const EnrollmentCard: React.FC<EnrollmentCardProps> = ({ enrollment, onClick }) 
           padding: var(--space-1) var(--space-2);
           border-radius: var(--radius-sm);
           border: 1px solid;
+        }
+
+        .no-procesado-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          font-size: 10px;
+          font-weight: 600;
+          text-transform: uppercase;
+          padding: var(--space-1) var(--space-2);
+          border-radius: var(--radius-sm);
+          background: #fef3c7;
+          color: #92400e;
+          border: 1px solid #fcd34d;
         }
 
         .concluded-badge {
@@ -148,6 +190,19 @@ const EnrollmentCard: React.FC<EnrollmentCardProps> = ({ enrollment, onClick }) 
           font-size: var(--text-xl);
           color: var(--color-text);
           line-height: 1.3;
+        }
+
+        /* No Procesado notice */
+        .no-procesado-notice {
+          display: flex;
+          align-items: center;
+          gap: var(--space-2);
+          padding: var(--space-3);
+          background: #fffbeb;
+          border: 1px solid #fde68a;
+          border-radius: var(--radius-md);
+          font-size: var(--text-xs);
+          color: #92400e;
         }
 
         /* Progress */
