@@ -7,13 +7,13 @@ interface HorariosTabProps {
 }
 
 const DIAS_SEMANA = [
-  { num: 0, short: 'Dom', full: 'Domingo' },
-  { num: 1, short: 'Lun', full: 'Lunes' },
-  { num: 2, short: 'Mar', full: 'Martes' },
-  { num: 3, short: 'Mié', full: 'Miércoles' },
-  { num: 4, short: 'Jue', full: 'Jueves' },
-  { num: 5, short: 'Vie', full: 'Viernes' },
-  { num: 6, short: 'Sáb', full: 'Sábado' },
+  { num: 0, short: 'Lun', full: 'Lunes' },
+  { num: 1, short: 'Mar', full: 'Martes' },
+  { num: 2, short: 'Mié', full: 'Miércoles' },
+  { num: 3, short: 'Jue', full: 'Jueves' },
+  { num: 4, short: 'Vie', full: 'Viernes' },
+  { num: 5, short: 'Sáb', full: 'Sábado' },
+  { num: 6, short: 'Dom', full: 'Domingo' },
 ];
 
 const defaultColors = { bg: '#dbeafe', border: '#bfdbfe', color: '#1e40af' };
@@ -73,7 +73,7 @@ const HorariosTab: React.FC<HorariosTabProps> = ({ schedules }) => {
       {/* Weekly Grid View (Desktop) */}
       <div className="schedule-grid hide-mobile">
         <div className="schedule-grid-header">
-          {DIAS_SEMANA.filter((d) => d.num !== 0).map((dia) => (
+          {DIAS_SEMANA.filter((d) => d.num !== 6).map((dia) => (
             <div
               key={dia.num}
               className={`grid-day-header ${grouped[dia.num]?.length ? 'has-classes' : ''}`}
