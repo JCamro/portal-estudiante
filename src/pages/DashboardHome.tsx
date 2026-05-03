@@ -499,19 +499,6 @@ const DashboardHome: React.FC = () => {
                       </p>
                     </div>
                   </div>
-                  <div className="summary-card summary-paid">
-                    <div className="summary-icon success">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <polyline points="20 6 9 17 4 12" />
-                      </svg>
-                    </div>
-                    <div className="summary-content">
-                      <h3>Pagado</h3>
-                      <p className="summary-amount">
-                        S/. {payments.filter((p) => p.estado === 'pagado').reduce((sum, p) => sum + parseFloat(p.monto_pagado || '0'), 0).toFixed(2)}
-                      </p>
-                    </div>
-                  </div>
                 </div>
 
                 {/* Payments List */}
