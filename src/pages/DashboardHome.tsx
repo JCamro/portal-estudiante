@@ -5,6 +5,9 @@ import { getEnrollments, getSchedules, getPayments, EnrollmentsResponse, Schedul
 import Header from '../components/layout/Header';
 import MobileDrawer from '../components/layout/MobileDrawer';
 import EnrollmentCard from '../components/enrollment/EnrollmentCard';
+import WelcomeModal, { hasSeenWelcome, dismissWelcome } from '../components/help/WelcomeModal';
+import TourOverlay from '../components/help/TourOverlay';
+import HelpModal, { HelpContext } from '../components/help/HelpModal';
 
 const DIAS_SEMANA = [
   { num: 1, short: 'Lun', full: 'Lunes' },
@@ -44,12 +47,25 @@ const DashboardHome: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<'schedule' | 'talleres' | 'pagos'>('schedule');
 
+  // Tutorial / Help state
+  const [showWelcome, setShowWelcome] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
+  const user = useAuthStore((s) => s.user);
+
   // Auto-select ciclo if only one exists
   useEffect(() => {
     if (ciclos.length === 1 && !cicloActivo) {
       setCicloActivo(ciclos[0]);
     }
   }, [ciclos, cicloActivo, setCicloActivo]);
+
+  // Onboarding: show welcome modal on first visit
+  useEffect(() => {
+    if (!hasSeenWelcome()) {
+      setShowWelcome(true);
+    }
+  }, []);
 
   // Fetch data when cicloActivo is available
   useEffect(() => {
@@ -102,6 +118,31 @@ const DashboardHome: React.FC = () => {
     const enrollment = enrollments.activas.find(e => e.taller?.nombre === schedule.taller_nombre);
     if (enrollment) {
       navigate(`/enrollment/${enrollment.id}`);
+    }
+  };
+
+  // Onboarding handlers
+  const handleStartTutorial = () => {
+    setShowWelcome(false);
+    setShowTutorial(true);
+  };
+
+  const handleSkipWelcome = () => {
+    dismissWelcome();
+    setShowWelcome(false);
+  };
+
+  const handleTutorialComplete = () => {
+    dismissWelcome();
+    setShowTutorial(false);
+  };
+
+  const getHelpContext = (): HelpContext => {
+    switch (activeSection) {
+      case 'schedule': return 'schedule';
+      case 'talleres': return 'talleres';
+      case 'pagos': return 'payments';
+      default: return 'dashboard';
     }
   };
 
@@ -168,8 +209,8 @@ const DashboardHome: React.FC = () => {
   if (!cicloActivo && ciclos.length > 1) {
     return (
       <div className="dashboard-home">
-        <Header title="Taller de Música Elguera" onMenuClick={() => setMobileMenuOpen(true)} />
-        <MobileDrawer isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} items={drawerItems} />
+      <Header title="Taller de Música Elguera" onMenuClick={() => setMobileMenuOpen(true)} onHelpClick={() => setShowHelp(true)} />
+        <MobileDrawer isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} items={drawerItems} onHelpClick={() => { setShowHelp(true); }} />
 
         <main className="dashboard-content">
           <div className="page-header animate-slide-down">
@@ -226,12 +267,13 @@ const DashboardHome: React.FC = () => {
   // Main dashboard (when cicloActivo is set)
   return (
     <div className="dashboard-home">
-      <Header title="Taller de Música Elguera" onMenuClick={() => setMobileMenuOpen(true)} />
+      <Header title="Taller de Música Elguera" onMenuClick={() => setMobileMenuOpen(true)} onHelpClick={() => setShowHelp(true)} />
       <MobileDrawer
         isOpen={mobileMenuOpen}
         onClose={() => setMobileMenuOpen(false)}
         items={drawerItems}
         onSectionChange={(section) => setActiveSection(section as 'schedule' | 'talleres' | 'pagos')}
+        onHelpClick={() => { setShowHelp(true); }}
       />
 
       <main className="dashboard-content">
@@ -243,7 +285,7 @@ const DashboardHome: React.FC = () => {
         ) : (
           <>
             {/* Section Toggle */}
-            <div className="section-toggle">
+            <div className="section-toggle" id="tour-section-toggle">
               <button
                 className={`toggle-btn ${activeSection === 'schedule' ? 'active' : ''}`}
                 onClick={() => setActiveSection('schedule')}
@@ -280,7 +322,7 @@ const DashboardHome: React.FC = () => {
 
             {/* Schedule Section */}
             {activeSection === 'schedule' && (
-              <section className="schedule-section animate-fade-in">
+              <section className="schedule-section animate-fade-in" id="tour-schedule-section">
                 <div className="section-header">
                   <h2>Mi Horario Semanal</h2>
                   <p>Todas tus clases de la semana</p>
@@ -377,7 +419,7 @@ const DashboardHome: React.FC = () => {
 
             {/* Talleres Section */}
             {activeSection === 'talleres' && (
-              <section className="talleres-section animate-fade-in">
+              <section className="talleres-section animate-fade-in" id="tour-talleres-section">
                 {enrollments.activas.length > 0 && (
                   <div className="enrollment-group">
                     <h2 className="group-title">
@@ -434,7 +476,7 @@ const DashboardHome: React.FC = () => {
 
             {/* Pagos Section */}
             {activeSection === 'pagos' && (
-              <section className="pagos-section animate-fade-in">
+              <section className="pagos-section animate-fade-in" id="tour-pagos-section">
                 <div className="section-header">
                   <h2>Mis Pagos</h2>
                   <p>Historial de recibos y pagos</p>
@@ -511,6 +553,27 @@ const DashboardHome: React.FC = () => {
           </>
         )}
       </main>
+
+      {/* Onboarding & Help Modals */}
+      {showWelcome && (
+        <WelcomeModal
+          userName={user?.nombre ?? ''}
+          onStartTutorial={handleStartTutorial}
+          onSkip={handleSkipWelcome}
+        />
+      )}
+      {showTutorial && (
+        <TourOverlay
+          isActive={showTutorial}
+          onComplete={handleTutorialComplete}
+          onSectionChange={(section) => setActiveSection(section as 'schedule' | 'talleres' | 'pagos')}
+        />
+      )}
+      <HelpModal
+        isOpen={showHelp}
+        context={getHelpContext()}
+        onClose={() => setShowHelp(false)}
+      />
 
       <style>{`
         .dashboard-home { min-height: 100vh; background: var(--color-bg); }

@@ -8,6 +8,7 @@ import InfoTab from '../components/detail/InfoTab';
 import HorariosTab from '../components/detail/HorariosTab';
 import AsistenciaTab from '../components/detail/AsistenciaTab';
 import PagosTab from '../components/detail/PagosTab';
+import HelpModal, { HelpContext } from '../components/help/HelpModal';
 
 type TabId = 'info' | 'horarios' | 'asistencia' | 'pagos';
 
@@ -74,6 +75,7 @@ const EnrollmentDetail: React.FC = () => {
   const [allAttendance, setAllAttendance] = useState<AttendanceRecord[]>([]);
   const [allPayments, setAllPayments] = useState<PaymentRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [showHelp, setShowHelp] = useState(false);
 
   useEffect(() => {
     if (!cicloActivo || !id) return;
@@ -131,6 +133,14 @@ const EnrollmentDetail: React.FC = () => {
     navigate('/');
   };
 
+  const getHelpContext = (): HelpContext => {
+    switch (activeTab) {
+      case 'asistencia': return 'attendance';
+      case 'pagos': return 'payments';
+      default: return 'info';
+    }
+  };
+
   const drawerItems = [
     {
       label: 'Mis Talleres',
@@ -148,7 +158,7 @@ const EnrollmentDetail: React.FC = () => {
     return (
       <div className="enrollment-detail">
         <Header title="Cargando..." showBackButton onBackClick={handleBack} onMenuClick={() => setMobileMenuOpen(true)} />
-        <MobileDrawer isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} items={drawerItems} />
+        <MobileDrawer isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} items={drawerItems} onHelpClick={() => { setShowHelp(true); }} />
         <main className="detail-content">
           <div className="loading-state">
             <div className="skeleton" style={{ height: 200 }} />
@@ -163,7 +173,7 @@ const EnrollmentDetail: React.FC = () => {
     return (
       <div className="enrollment-detail">
         <Header title="No encontrado" showBackButton onBackClick={handleBack} onMenuClick={() => setMobileMenuOpen(true)} />
-        <MobileDrawer isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} items={drawerItems} />
+        <MobileDrawer isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} items={drawerItems} onHelpClick={() => { setShowHelp(true); }} />
         <main className="detail-content">
           <div className="empty-state">
             <p>No se encontró la matrícula.</p>
@@ -180,6 +190,7 @@ const EnrollmentDetail: React.FC = () => {
         showBackButton
         onBackClick={handleBack}
         onMenuClick={() => setMobileMenuOpen(true)}
+        onHelpClick={() => setShowHelp(true)}
       />
       <MobileDrawer isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} items={drawerItems} />
 
@@ -209,6 +220,12 @@ const EnrollmentDetail: React.FC = () => {
         {activeTab === 'asistencia' && <AsistenciaTab attendance={filteredAttendance} />}
         {activeTab === 'pagos' && <PagosTab payments={filteredPayments} isNoProcesado={enrollment?.estado_calculado === 'no_procesado'} />}
       </main>
+
+      <HelpModal
+        isOpen={showHelp}
+        context={getHelpContext()}
+        onClose={() => setShowHelp(false)}
+      />
 
       <style>{`
         .enrollment-detail {
