@@ -38,6 +38,10 @@ portal-estudiante/
 │   │   │   └── PagosTab.tsx     # Recibos y pagos
 │   │   ├── enrollment/          # Componentes de matrícula
 │   │   │   └── EnrollmentCard.tsx
+│   │   ├── help/                # Onboarding y ayuda
+│   │   │   ├── WelcomeModal.tsx # Modal primera visita (Ver tutorial / Saltar)
+│   │   │   ├── TourOverlay.tsx  # Tour guiado con spotlight tooltips
+│   │   │   └── HelpModal.tsx    # Ayuda contextual (6 contextos)
 │   │   └── layout/              # Layout components
 │   │       ├── Header.tsx       # Header con selector de ciclo + hamburger
 │   │       └── MobileDrawer.tsx # Drawer de navegación móvil
@@ -427,11 +431,14 @@ content:
 
 - **NO ejecutar build** después de cambios — el usuario lo hace
 - **Backend fields**: Verificar campos reales del backend antes de usar
-- **Filtrado**: Backend NO devuelve `matricula_id` en asistencias — usar `taller_nombre`
-- **Pagos**: `paquetes` es array de strings, no un solo string
+- **Filtrado**: Backend ahora SÍ devuelve `matricula` (FK numérico) en asistencias — usar `a.matricula === enrollment.id` para filtrar. Nunca usar `taller_nombre` porque mezcla matrículas del mismo taller.
+- **estado_calculado**: El portal recibe `estado_calculado` ('activa' | 'no_procesado') en cada matrícula. Usarlo para detectar matrículas sin recibo.
+- **Pagos**: `paquetes` es array de strings. Para filtrar por matrícula exacta usar `matricula_ids` (array de números, vía ReciboMatricula).
 - **Ciclo change**: Siempre navegar a `/` después de cambiar ciclo
 - **localStorage**: Siempre wrap en try-catch (falla en private mode)
+- **Onboarding**: `WelcomeModal` (primera visita, `portal_welcome_dismissed`) + `TourOverlay` (spotlight tooltips, `portal_tutorial_completed`). Ambos usan localStorage. El botón "?" en el Header abre `HelpModal` contextual.
+- **Componentes help**: `WelcomeModal`, `TourOverlay`, `HelpModal` en `src/components/help/`.
 
 ---
 
-_Ultima actualización: Abril 2026_
+_Ultima actualización: Mayo 2026_
