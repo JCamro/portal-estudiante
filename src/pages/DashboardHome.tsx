@@ -10,13 +10,17 @@ import TourOverlay from '../components/help/TourOverlay';
 import HelpModal, { HelpContext } from '../components/help/HelpModal';
 
 const DIAS_SEMANA = [
-  { num: 1, short: 'Lun', full: 'Lunes' },
-  { num: 2, short: 'Mar', full: 'Martes' },
-  { num: 3, short: 'Mié', full: 'Miércoles' },
-  { num: 4, short: 'Jue', full: 'Jueves' },
-  { num: 5, short: 'Vie', full: 'Viernes' },
-  { num: 6, short: 'Sáb', full: 'Sábado' },
+  { num: 0, short: 'Lun', full: 'Lunes' },
+  { num: 1, short: 'Mar', full: 'Martes' },
+  { num: 2, short: 'Mié', full: 'Miércoles' },
+  { num: 3, short: 'Jue', full: 'Jueves' },
+  { num: 4, short: 'Vie', full: 'Viernes' },
+  { num: 5, short: 'Sáb', full: 'Sábado' },
+  { num: 6, short: 'Dom', full: 'Domingo' },
 ];
+
+// Exclude Sunday (no classes on Sundays) for grid layout (6 columns)
+const DIAS_SEMANA_GRID = DIAS_SEMANA.filter(d => d.num !== 6);
 
 const TALLER_COLORS = [
   { bg: '#dbeafe', border: '#93c5fd', color: '#1e40af' },
@@ -343,7 +347,7 @@ const DashboardHome: React.FC = () => {
                     {/* Header row with empty time cell + day names */}
                     <div className="schedule-header-row">
                       <div className="time-header-cell"></div>
-                      {DIAS_SEMANA.map((dia) => {
+                      {DIAS_SEMANA_GRID.map((dia) => {
                         const hasClasses = schedulesByDay[dia.num]?.length > 0;
                         return (
                           <div key={dia.num} className={`day-header ${hasClasses ? 'has-classes' : ''}`}>
@@ -362,7 +366,7 @@ const DashboardHome: React.FC = () => {
                         return (
                           <div key={hour} className="time-row">
                             <div className="time-label">{timeStr}</div>
-                            {DIAS_SEMANA.map((dia) => {
+                            {DIAS_SEMANA_GRID.map((dia) => {
                               const classAtSlot = schedulesByDay[dia.num]?.find((s) => {
                                 const start = timeToMinutes(s.hora_inicio);
                                 const slotStart = hour * 60;
