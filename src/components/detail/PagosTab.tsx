@@ -3,6 +3,7 @@ import { PaymentRecord } from '../../api/portal';
 
 interface PagosTabProps {
   payments: PaymentRecord[];
+  isNoProcesado?: boolean;
 }
 
 const estadoConfig: Record<string, { label: string; color: string; bg: string; icon: React.ReactNode }> = {
@@ -51,16 +52,48 @@ const formatDate = (dateStr: string): string => {
   return date.toLocaleDateString('es-PE', { day: 'numeric', month: 'short', year: 'numeric' });
 };
 
-const PagosTab: React.FC<PagosTabProps> = ({ payments }) => {
+const PagosTab: React.FC<PagosTabProps> = ({ payments, isNoProcesado = false }) => {
   if (payments.length === 0) {
     return (
       <div className="pagos-tab">
         <div className="empty-state">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-            <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
-            <line x1="1" y1="10" x2="23" y2="10" />
-          </svg>
-          <p>No hay recibos registrados para este taller.</p>
+          {isNoProcesado ? (
+            <>
+              <div className="empty-icon no-procesado-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="8" x2="12" y2="12" />
+                  <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+              </div>
+              <h3 className="empty-title">Sin procesar</h3>
+              <p>Secretaría aún no ha generado el recibo para esta matrícula. Una vez que se procese, verás los detalles aquí.</p>
+              <div className="no-procesado-steps">
+                <div className="step">
+                  <span className="step-number">1</span>
+                  <span>Completá tu matrícula</span>
+                </div>
+                <div className="step-arrow">→</div>
+                <div className="step">
+                  <span className="step-number">2</span>
+                  <span>Secretaría genera el recibo</span>
+                </div>
+                <div className="step-arrow">→</div>
+                <div className="step">
+                  <span className="step-number">3</span>
+                  <span>Visualizás tus pagos aquí</span>
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+                <line x1="1" y1="10" x2="23" y2="10" />
+              </svg>
+              <p>No hay recibos registrados para este taller.</p>
+            </>
+          )}
         </div>
       </div>
     );
@@ -441,6 +474,61 @@ const PagosTab: React.FC<PagosTabProps> = ({ payments }) => {
           border-radius: var(--radius-md);
           font-size: var(--text-xs);
           color: #92400e;
+        }
+
+        .empty-icon {
+          margin-bottom: var(--space-4);
+          opacity: 0.6;
+        }
+
+        .empty-icon.no-procesado-icon {
+          opacity: 0.8;
+          color: #d97706;
+        }
+
+        .empty-title {
+          font-family: var(--font-heading);
+          font-size: var(--text-lg);
+          color: #92400e;
+          margin: 0 0 var(--space-2);
+        }
+
+        .no-procesado-steps {
+          display: flex;
+          align-items: center;
+          gap: var(--space-2);
+          margin-top: var(--space-4);
+          padding: var(--space-3);
+          background: #f9fafb;
+          border-radius: var(--radius-md);
+          border: 1px solid var(--color-border);
+        }
+
+        .step {
+          display: flex;
+          align-items: center;
+          gap: var(--space-2);
+          font-size: var(--text-xs);
+          color: var(--color-text-secondary);
+        }
+
+        .step-number {
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          background: #fef3c7;
+          color: #92400e;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 700;
+          font-size: 11px;
+          flex-shrink: 0;
+        }
+
+        .step-arrow {
+          color: #d1d5db;
+          font-size: var(--text-sm);
         }
 
         /* Mobile */

@@ -29,9 +29,27 @@ const InfoTab: React.FC<InfoTabProps> = ({ enrollment }) => {
   const pct = enrollment.sesiones_contratadas > 0
     ? Math.round((enrollment.sesiones_consumidas / enrollment.sesiones_contratadas) * 100)
     : 0;
+  const isNoProcesado = enrollment.estado_calculado === 'no_procesado';
 
   return (
     <div className="info-tab">
+      {/* No Procesada Alert */}
+      {isNoProcesado && (
+        <div className="no-procesado-alert">
+          <div className="alert-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+          </div>
+          <div className="alert-content">
+            <h3>Matrícula sin procesar</h3>
+            <p>Secretaría aún no ha generado tu recibo. Una vez procesado, podrás ver tus sesiones, asistencias y pagos aquí.</p>
+          </div>
+        </div>
+      )}
+
       {/* Progress Card */}
       <div className="info-card">
         <h3 className="card-title">Progreso de Sesiones</h3>
@@ -114,8 +132,8 @@ const InfoTab: React.FC<InfoTabProps> = ({ enrollment }) => {
           </div>
           <div className="detail-row">
             <span className="detail-label">Estado</span>
-            <span className={`detail-badge ${enrollment.concluida ? 'badge-concluded' : 'badge-active'}`}>
-              {enrollment.concluida ? 'Culminada' : 'Activa'}
+            <span className={`detail-badge ${isNoProcesado ? 'badge-no-procesado' : enrollment.concluida ? 'badge-concluded' : 'badge-active'}`}>
+              {isNoProcesado ? 'Sin procesar' : enrollment.concluida ? 'Culminada' : 'Activa'}
             </span>
           </div>
         </div>
@@ -261,6 +279,49 @@ const InfoTab: React.FC<InfoTabProps> = ({ enrollment }) => {
         .badge-concluded {
           background: var(--color-surface-hover);
           color: var(--color-text-muted);
+        }
+
+        .badge-no-procesado {
+          background: #fef3c7;
+          color: #92400e;
+        }
+
+        /* No Procesada Alert */
+        .no-procesado-alert {
+          display: flex;
+          align-items: flex-start;
+          gap: var(--space-4);
+          padding: var(--space-5);
+          background: linear-gradient(135deg, #fffbeb, #fef3c7);
+          border: 1px solid #fcd34d;
+          border-radius: var(--radius-xl);
+          box-shadow: 0 1px 3px rgba(234, 179, 8, 0.15);
+        }
+
+        .alert-icon {
+          width: 48px;
+          height: 48px;
+          border-radius: var(--radius-lg);
+          background: #fef3c7;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #d97706;
+          flex-shrink: 0;
+        }
+
+        .alert-content h3 {
+          font-family: var(--font-heading);
+          font-size: var(--text-base);
+          color: #92400e;
+          margin-bottom: var(--space-1);
+        }
+
+        .alert-content p {
+          font-size: var(--text-sm);
+          color: #a16207;
+          margin: 0;
+          line-height: 1.5;
         }
 
         /* Mobile */

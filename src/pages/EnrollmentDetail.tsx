@@ -113,24 +113,18 @@ const EnrollmentDetail: React.FC = () => {
     return allSchedules.filter((s) => s.taller_nombre === enrollment.taller?.nombre);
   }, [allSchedules, enrollment]);
 
-  // Filter attendance by taller name (backend doesn't return matricula_id)
+  // Filter attendance by matricula_id (precise filter, handles re-enrollments in same taller)
   const filteredAttendance = useMemo(() => {
-    if (!enrollment || !enrollment.taller?.nombre) return [];
-    return allAttendance.filter((a) => a.taller_nombre === enrollment.taller?.nombre);
+    if (!enrollment) return [];
+    return allAttendance.filter((a) => a.matricula === enrollment.id);
   }, [allAttendance, enrollment]);
 
-  // Filter payments: show all that match this taller OR have empty paquetes
-  // (backend already filters by student, paquetes can be empty if recibo was edited)
+  // Filter payments: show only receipts that include this enrollment's matricula
   const filteredPayments = useMemo(() => {
-    if (!enrollment) return allPayments;
-    if (!enrollment.taller?.nombre) return allPayments;
-    const tallerNombre = enrollment.taller.nombre;
-    return allPayments.filter((p) => {
-      // If paquetes is empty/null (recibo edited, ReciboMatricula deleted), show it anyway
-      if (!p.paquetes || p.paquetes.length === 0) return true;
-      // If paquetes has data, match by taller name
-      return p.paquetes.some((nombre) => nombre === tallerNombre);
-    });
+    if (!enrollment) return [];
+    return allPayments.filter((p) =>
+      p.matricula_ids && p.matricula_ids.includes(enrollment.id)
+    );
   }, [allPayments, enrollment]);
 
   const handleBack = () => {
@@ -213,7 +207,7 @@ const EnrollmentDetail: React.FC = () => {
         {activeTab === 'info' && <InfoTab enrollment={enrollment} />}
         {activeTab === 'horarios' && <HorariosTab schedules={filteredSchedules} tallerNombre={enrollment.taller?.nombre} />}
         {activeTab === 'asistencia' && <AsistenciaTab attendance={filteredAttendance} />}
-        {activeTab === 'pagos' && <PagosTab payments={filteredPayments} />}
+        {activeTab === 'pagos' && <PagosTab payments={filteredPayments} isNoProcesado={enrollment?.estado_calculado === 'no_procesado'} />}
       </main>
 
       <style>{`
